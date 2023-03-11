@@ -18,4 +18,12 @@
     <string name="retrofit_download">Retrofit - Type-safe HTTP client for Android and Java by Square, Inc</string>
     <string name="downloading_text">Downloading</string>
     <string name="download_text">Download</string>
+    <string name="loadApp_url">https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip</string>
+    <string name="glide_url">https://github.com/bumptech/glide/archive/master.zip</string>
+    <string name="retrofit_url">https://github.com/square/retrofit/archive/master.zip</string>
+    <string name="describe_download">Select a link to download.</string>
+    <string name="fileNameLabel">File Name:</string>
+    <string name="statusLabel">Status:</string>
+    <string name="status_success">Success</string>
+    <string name="go_to_details">Go to details</string>
 </resources>

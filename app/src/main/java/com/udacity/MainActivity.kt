@@ -3,7 +3,6 @@ package com.udacity
 import android.app.DownloadManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -12,8 +11,8 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -22,10 +21,7 @@ import kotlinx.android.synthetic.main.content_main.*
 class MainActivity : AppCompatActivity() {
 
     private var downloadID: Long = 0
-
-    private lateinit var notificationManager: NotificationManager
-    private lateinit var pendingIntent: PendingIntent
-    private lateinit var action: NotificationCompat.Action
+    private lateinit var fileName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,8 +31,32 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
         custom_button.setOnClickListener {
-            custom_button.buttonState = ButtonState.Loading
-            download()
+
+            when (radioGroup.checkedRadioButtonId) {
+                -1 -> {
+                    Toast.makeText(
+                        applicationContext,
+                        getString(R.string.describe_download),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                R.id.glideDownload -> {
+                    custom_button.buttonState = ButtonState.Loading
+                    download(getString(R.string.glide_url))
+                    fileName = getString(R.string.glide_download)
+                }
+                R.id.loadAppDownload -> {
+                    custom_button.buttonState = ButtonState.Loading
+                    download(getString(R.string.loadApp_url))
+                    fileName = getString(R.string.load_app_download)
+                }
+                R.id.retrofitDownload -> {
+                    custom_button.buttonState = ButtonState.Loading
+                    download(getString(R.string.retrofit_url))
+                    fileName = getString(R.string.retrofit_download)
+                }
+            }
+
         }
 
         createChannel(
@@ -48,21 +68,31 @@ class MainActivity : AppCompatActivity() {
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+
+            if (downloadID != id) {
+                return
+            }
+
             val notificationManager = ContextCompat.getSystemService(
                 requireNotNull(context),
                 NotificationManager::class.java
             ) as NotificationManager
 
             custom_button.buttonState = ButtonState.Completed
-
-            notificationManager.sendNotification("It worked", applicationContext)
+            val status = getString(R.string.status_success)
+            notificationManager.sendNotification(
+                "Download Complete.",
+                applicationContext,
+                fileName,
+                status
+            )
 
         }
     }
 
-    private fun download() {
+    private fun download(url: String) {
         val request =
-            DownloadManager.Request(Uri.parse(URL))
+            DownloadManager.Request(Uri.parse(url))
                 .setTitle(getString(R.string.app_name))
                 .setDescription(getString(R.string.app_description))
                 .setRequiresCharging(false)
@@ -93,11 +123,4 @@ class MainActivity : AppCompatActivity() {
             notificationManager.createNotificationChannel(notificationChannel)
         }
     }
-
-    companion object {
-        private const val URL =
-            "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip"
-        private const val CHANNEL_ID = "channelId"
-    }
-
 }
