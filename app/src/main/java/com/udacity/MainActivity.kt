@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
         custom_button.setOnClickListener {
+            custom_button.buttonState = ButtonState.Loading
             download()
         }
 
@@ -42,8 +43,7 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.load_app_channel_id),
             getString(R.string.load_app_channel_name),
         )
-            download()
-        }
+    }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -52,6 +52,8 @@ class MainActivity : AppCompatActivity() {
                 requireNotNull(context),
                 NotificationManager::class.java
             ) as NotificationManager
+
+            custom_button.buttonState = ButtonState.Completed
 
             notificationManager.sendNotification("It worked", applicationContext)
 
